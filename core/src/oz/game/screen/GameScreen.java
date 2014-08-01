@@ -1,0 +1,342 @@
+package oz.game.screen;
+
+import java.util.ArrayList;
+
+import oz.game.actor.BallActor;
+import oz.game.actor.LineActor;
+import oz.game.actor.RectActor;
+import oz.game.avoid.MyGdxGame;
+import oz.game.base.OzScreen;
+import oz.game.base.fontutils.OzFont;
+import static oz.game.base.OzUtils.*;
+import oz.game.global.G;
+import oz.game.global.Screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+
+public class GameScreen extends OzScreen {
+
+	private static final int STATUS_PLAY=-50,STATUS_PLAYTOPAUSE=-200,
+			                  STATUS_PAUSE=-100,STATUS_PAUSETOPLAY=-300; 
+	
+	private static final float PAUSE_SHOW_TIME = 0.25f;
+    private Image backGround;
+	private BallActor ball;
+	private RectActor rectA;
+	private RectActor rectB;
+	private RectActor rectC;
+	private RectActor rectD;
+	/**计分板*/
+	private OzFont scoreFont;
+	/**里面有ABCD*/
+	private ArrayList<RectActor> rects;
+	private LineActor line;
+
+	/**游戏状态,暂停和游戏状态*/
+	private int status;
+	
+	private ImageButton pauseBtn;
+	private Image pauseWindowBg;
+	private ImageButton resumeBtn;
+	private ImageButton restartBtn;
+	private ImageButton mainBtn;
+	int i=0;
+
+	public GameScreen(MyGdxGame game, String currentScreenName) {
+		super(game, currentScreenName);
+		setDefaultStage();
+
+		backGround = new Image(newTexture(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.GAMESCREEN_BACKGROUND_COLOR));
+
+		pauseBtn = new ImageButton(newTRDrawable("image/pause/pauseUp.png"),
+				newTRDrawable("image/pause/pauseDown.png"));
+		pauseWindowBg = new Image(newTRDrawable("image/pause/pauseBg.png"));
+		resumeBtn= new ImageButton(newTRDrawable("image/pause/resumeUp.png"), newTRDrawable("image/pause/resumeDown.png"));
+		restartBtn = new ImageButton(newTRDrawable("image/pause/restartUp.png"), newTRDrawable("image/pause/restartDown.png"));
+		mainBtn =  new ImageButton(newTRDrawable("image/pause/mainUp.png"), newTRDrawable("image/pause/mainDown.png"));
+		addEvent();
+	}
+	@Override
+	public void reset() {
+		G.resetSpeed();
+		scoreFont = new OzFont("得分",50, Color.BLACK, newTexture(1, 1, Color.WHITE ));
+		Vector2 fontPosition = screenToStageCoordinates(0, Gdx.graphics.getHeight());
+		fontPosition.y -= scoreFont.getFontHeight()*2;
+		scoreFont.setX(fontPosition.x);
+		scoreFont.setY(fontPosition.y);
+		scoreFont.setExtraText("得分:");
+		status = STATUS_PLAY;
+		darkAlpha = 1;
+		stage.getActors().clear();
+		Color rectColor = getRandomColor();
+		rectA = new RectActor(G.REFER_SCREEN_HEIGHT,rectColor);
+		rectB = new RectActor(rectA,rectColor);
+		rectC = new RectActor(rectB,rectColor);
+		rectD = new RectActor(rectC,rectColor);
+		ball = new BallActor(G.REFER_SCREEN_WIDTH/2);
+		if(rects==null){
+			rects = new ArrayList<RectActor>();
+		}
+		rects.clear();
+		rects.add(rectA);rects.add(rectB);rects.add(rectC);rects.add(rectD);
+		line = new LineActor();
+		LineActor.playWith(ball);
+		RectActor.playWith(ball);
+		stage.addActor(backGround);
+		stage.addActor(line);
+		stage.addActor(rectA);
+		stage.addActor(rectB);
+		stage.addActor(rectC);
+		stage.addActor(rectD);
+		stage.addActor(ball);
+		Vector2 pauseBtnPosition = screenToStageCoordinates(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+		pauseBtnPosition.x -= pauseBtn.getWidth();
+		pauseBtnPosition.y -= pauseBtn.getHeight();
+		pauseBtn.setPosition(pauseBtnPosition.x, pauseBtnPosition.y);
+		stage.addActor(pauseBtn);
+		pauseWindowBg.setPosition(0,-pauseWindowBg.getHeight());
+		this.refreshPauseBtnsPosition();
+		stage.addActor(scoreFont);
+		stage.addActor(pauseWindowBg);
+		stage.addActor(resumeBtn);
+		stage.addActor(restartBtn);
+		stage.addActor(mainBtn);
+	}
+	@Override
+	public void addEvent() {
+		stage.addListener(new InputListener(){
+			@Override
+			public boolean keyDown(InputEvent event, int keycode) {
+				if(keycode==BallActor.DIR_LEFT){
+					ball.setDir(BallActor.DIR_LEFT);
+				}
+				else if(keycode==BallActor.DIR_RIGHT){
+					ball.setDir(BallActor.DIR_RIGHT);
+				}
+				return true;
+			}
+			@Override
+			public boolean keyUp(InputEvent event, int keycode) {
+				if(keycode==ball.getDir()){
+					ball.setDir(BallActor.DIR_FREE);
+				}
+				return true;
+			}
+			
+		});
+		pauseBtn.addListener(new InputListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				status = STATUS_PLAYTOPAUSE;
+
+				pauseWindowBg.addAction(Actions.moveTo(0,0,PAUSE_SHOW_TIME));
+				for(RectActor rect:rects){
+					rect.setUseLogic(false);
+					rect.addAction(Actions.moveTo(rect.getX(),rect.getY()+pauseWindowBg.getHeight(), PAUSE_SHOW_TIME));
+				}
+				ball.setUseLogic(false);
+				ball.addAction(Actions.moveTo(ball.getX(),ball.getY()+pauseWindowBg.getHeight(), PAUSE_SHOW_TIME));
+				line.setUseLogic(false);
+				line.addAction(Actions.moveTo(line.getX(),line.getY()+pauseWindowBg.getHeight(), PAUSE_SHOW_TIME));
+				pauseBtn.addAction(Actions.moveTo(pauseBtn.getX(),pauseBtn.getY()+pauseWindowBg.getHeight(),PAUSE_SHOW_TIME));
+				return true;
+			}
+		});
+		resumeBtn.addListener(new InputListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				return true;
+			}
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+					int pointer, int button) {
+				if(x>0&&x<resumeBtn.getWidth()&&y>0&&y<resumeBtn.getHeight()){
+					status = STATUS_PAUSETOPLAY;
+
+					pauseWindowBg.addAction(Actions.moveTo(0,-pauseWindowBg.getHeight(),PAUSE_SHOW_TIME));
+					for(RectActor rect:rects){
+						rect.addAction(Actions.moveTo(rect.getX(),rect.getY()-pauseWindowBg.getHeight(), PAUSE_SHOW_TIME));
+					}
+					ball.addAction(Actions.moveTo(ball.getX(),ball.getY()-pauseWindowBg.getHeight(), PAUSE_SHOW_TIME));
+					line.addAction(Actions.moveTo(line.getX(),line.getY()-pauseWindowBg.getHeight(), PAUSE_SHOW_TIME));
+					pauseBtn.addAction(Actions.moveTo(pauseBtn.getX(),pauseBtn.getY()-pauseWindowBg.getHeight(),PAUSE_SHOW_TIME));
+				}
+			}
+		});
+		restartBtn.addListener(new InputListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				return true;
+			}
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+					int pointer, int button) {
+				if(x>0&&x<restartBtn.getWidth()&&y>0&&y<restartBtn.getHeight()){
+					setRefreshScreen(true);//重新进入此screen
+				}
+			}
+		});
+		mainBtn.addListener(new InputListener(){
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {return true;}
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+					int pointer, int button) {
+				if(x>0&&x<restartBtn.getWidth()&&y>0&&y<restartBtn.getHeight()){
+					setScreen(Screens.MAIN);
+				}
+			}
+		});
+	}
+	
+	@Override
+	public boolean begin(float delta) {
+		stage.act();
+		stage.draw();
+		
+		darkAlpha-=0.05f;
+		if(darkAlpha<=0){
+			return true;	
+		}
+		else{
+			setDarkness(darkAlpha);
+		}
+		return false;
+	}
+	@Override
+	public void actAndDraw(float delta) {
+		if(status==STATUS_PLAY){
+			this.play();
+		}
+		else if(status==STATUS_PLAYTOPAUSE){
+			line.act(delta);
+			for(RectActor rect:rects){
+				rect.act(delta);
+			}
+			ball.act(delta);
+			pauseBtn.act(delta);
+			pauseWindowBg.act(delta);
+			refreshPauseBtnsPosition();
+			stage.draw();
+			if(pauseWindowBg.getActions().size==0){
+				status = STATUS_PAUSE;
+			}
+		}
+		else if(status == STATUS_PAUSE){
+			stage.draw();
+		}
+		else if(status == STATUS_PAUSETOPLAY){
+			line.act(delta);
+			for(RectActor rect:rects){
+				rect.act(delta);
+			}
+			ball.act(delta);
+			pauseBtn.act(delta);
+			pauseWindowBg.act(delta);
+			refreshPauseBtnsPosition();
+			stage.draw();
+			if(pauseWindowBg.getActions().size==0){
+				for(RectActor rect:rects){
+					rect.setUseLogic(true);
+				}
+				ball.setUseLogic(true);
+				line.setUseLogic(true);
+				status = STATUS_PLAY;
+			}
+		}
+		
+	}
+	
+	private void play(){
+		stage.act();
+		if(line.replaceColorFinish() 
+				&& rectA.replaceColorFinish()
+				&& rectB.replaceColorFinish()
+				&& rectC.replaceColorFinish()
+				&& rectD.replaceColorFinish()
+				){
+			G.setReplaceColorFinish(true);
+		}
+		if(G.isUseNextColor()){
+			if(G.isReplaceColorFinish()){
+				line.replaceColor(getRandomColor());
+				Color rectColor = getRandomColor();
+				rectA.replaceColor(rectColor);
+				rectB.replaceColor(rectColor);
+				rectC.replaceColor(rectColor);
+				rectD.replaceColor(rectColor);
+				G.setReplaceColorFinish(false);
+			}
+			G.setUseNextColor(false);
+		}
+//		scoreFont.setExtraText("得分: "+(i++));
+		stage.draw();
+	}
+
+	@Override
+	public boolean end(float delta) {
+//		stage.act();在此不需再执行逻辑
+		stage.draw();
+		setDarkness(darkAlpha);
+//		stage.getActors().clear();
+		darkAlpha += dAlpha;
+		if(darkAlpha<1){
+			
+			return false;
+		}
+//		darkAlpha -=0.2f;
+		return true;
+	}
+
+
+	/**刷新暂停菜单里那三个按钮所处的位置*/
+	private void refreshPauseBtnsPosition(){
+		resumeBtn.setPosition(pauseWindowBg.getX()+14,pauseWindowBg.getY()+10);
+		restartBtn.setPosition(resumeBtn.getRight()+14, resumeBtn.getY());
+		mainBtn.setPosition(restartBtn.getRight()+14, resumeBtn.getY());
+	}
+	
+
+
+	@Override
+	public void hide() {
+		drawDarkness(1f);
+	}
+
+	@Override
+	public void pause() {
+		
+	}
+
+	@Override
+	public void resume() {
+		System.out.println("GameScreen.resume()");
+		
+	}
+	
+
+
+	@Override
+	public void dispose() {
+		
+	}
+
+	
+
+
+
+}
