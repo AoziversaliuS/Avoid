@@ -9,6 +9,7 @@ import oz.game.action.ReplaceColorAction;
 import oz.game.base.OzActor;
 import oz.game.base.OzUtils;
 import oz.game.global.G;
+import oz.game.screen.GameScreen;
 
 public class RectActor extends OzActor{
 	/**在此方块之上放置另外一个方块的距离*/
@@ -22,10 +23,11 @@ public class RectActor extends OzActor{
 	private static int WIDTH = 60;
 	private static int HEIGHT = 160;
 	/**最上面的那个方块*/
-
 	private Sprite rectSpriteA;
 	private Sprite rectSpriteB;
 	private ReplaceColorAction replaceColorAction;
+	
+	
 	
 	public RectActor(float centerX,float centerY,Color color) {
 		this(color);
@@ -57,13 +59,13 @@ public class RectActor extends OzActor{
 	}
 	@Override
 	public void logic(float delta) {
-		if((getTop()-G.getSpeed())<0/*判断移动后的位置是否小于0*/){
+		if((getTop()-GameScreen.getCurrentSpeed())<0/*判断移动后的位置是否小于0*/){
 			setX(getRandomX());
 			setY(lastRectActor.getTop()+NEXT_RECT_LIMIT_Y);
 			lastRectActor = this;//将此方块设置为最上面的那一个方块
 		}
 		else{
-			setY( getY()-G.getSpeed());
+			setY( getY()-GameScreen.getCurrentSpeed());
 		}
 		//碰撞检测
 		if(this.impact(ball)){

@@ -10,6 +10,7 @@ import oz.game.action.ReplaceColorAction;
 import oz.game.base.OzActor;
 import oz.game.base.OzUtils;
 import oz.game.global.G;
+import oz.game.screen.GameScreen;
 
 public class LineActor extends OzActor{
 
@@ -28,6 +29,7 @@ public class LineActor extends OzActor{
 	private Sprite lineSpriteA;
 	private Sprite lineSpriteB;
 	private Sprite overlapSprite;
+	
 	
 	private int count;
 	/**判断是否已经触碰过了,若已经触碰过了则忽视此次触碰*/
@@ -62,13 +64,13 @@ public class LineActor extends OzActor{
 				setX(getRandomX());
 			}
 			else{
-				setY(getY()-G.getSpeed());
+				setY(getY()-GameScreen.getCurrentSpeed());
 			}
 		}
 		if(impact(ball)){
 			if(!impacted){
 				G.setUseNextColor(true);
-				G.increateSpeed();
+				GameScreen.increateSpeed();
 				impacted = true;
 			}
 		}

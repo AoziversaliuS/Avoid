@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.viewport.ScalingViewport;
 /**不能重写show和render方法,否则底层将不起作用,begin结束后自动设置监听为stage*/
 public abstract class OzScreen implements Screen{
 
-	private static final boolean SHOW_FPS = true,DEBUG = false;
+	private static final boolean SHOW_FPS = false,DEBUG = false;
 	private static final long SLEEP_TIME = 150;
 	
 	public MyGdxGame game;

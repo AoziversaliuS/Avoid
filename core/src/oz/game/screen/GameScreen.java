@@ -29,7 +29,13 @@ public class GameScreen extends OzScreen {
 
 	private static final int STATUS_PLAY=-50,STATUS_PLAYTOPAUSE=-200,
 			                  STATUS_PAUSE=-100,STATUS_PAUSETOPLAY=-300; 
-	
+	private static final float DEFAULT_SPEED = 7F;
+	/**默认的计分间隔*/private static final float DEFAULT_SCORE_TIME = 60;
+	/**默认的计分时间递减值*/private static final float DEFAULT_SCORE_TIME_DECREMENT = 10;
+	/**计分时间的递减值的递减值*/private static final float SCORE_TIME_DECREMENT_DECREMENT = 0.9F;
+	/**默认的每一次计分被累加的分值*/private static final int DEFAULT_SCORE_VALUE = 1;
+	/**计分累加值的递增值*/private static final int DEFAULT_SCORE_VALUE_INCREMENT = 2;
+	/**速度的增量*/private static final float INCREMENT_SPEED = 1F;
 	private static final float PAUSE_SHOW_TIME = 0.25f;
     private Image backGround;
 	private BallActor ball;
@@ -37,8 +43,15 @@ public class GameScreen extends OzScreen {
 	private RectActor rectB;
 	private RectActor rectC;
 	private RectActor rectD;
+	private static float currentSpeed;
 	/**计分板*/
 	private OzFont scoreFont;
+	private static int currentScore;
+	/** currentScore +=scoreValue */
+	private static int scoreValue;
+	private static float currentScoreTime;
+	private static float maxScoreTime;
+	private static float scoreTimeDecrement;
 	/**里面有ABCD*/
 	private ArrayList<RectActor> rects;
 	private LineActor line;
@@ -69,13 +82,19 @@ public class GameScreen extends OzScreen {
 	}
 	@Override
 	public void reset() {
-		G.resetSpeed();
+		scoreValue = DEFAULT_SCORE_VALUE;
+		currentScore = 0;
+		currentScoreTime = 0;
+		maxScoreTime = DEFAULT_SCORE_TIME;
+		currentSpeed = DEFAULT_SPEED;
+		scoreTimeDecrement = DEFAULT_SCORE_TIME_DECREMENT;
 		scoreFont = new OzFont("得分",50, Color.BLACK, newTexture(1, 1, Color.WHITE ));
 		Vector2 fontPosition = screenToStageCoordinates(0, Gdx.graphics.getHeight());
 		fontPosition.y -= scoreFont.getFontHeight()*2;
 		scoreFont.setX(fontPosition.x);
 		scoreFont.setY(fontPosition.y);
 		scoreFont.setExtraText("得分:");
+		
 		status = STATUS_PLAY;
 		darkAlpha = 1;
 		stage.getActors().clear();
@@ -283,7 +302,15 @@ public class GameScreen extends OzScreen {
 			}
 			G.setUseNextColor(false);
 		}
-//		scoreFont.setExtraText("得分: "+(i++));
+		if(currentScoreTime>=maxScoreTime){
+			currentScoreTime = 0;
+			currentScore += scoreValue;
+		}
+		else{
+			currentScoreTime++;
+		}
+		
+		scoreFont.setExtraText("得分: "+currentScore);
 		stage.draw();
 	}
 
@@ -334,8 +361,28 @@ public class GameScreen extends OzScreen {
 	public void dispose() {
 		
 	}
-
-	
+	/**加速并刷新积分增加规则*/
+	public static void increateSpeed(){
+		currentSpeed += INCREMENT_SPEED;
+		if(maxScoreTime>=(scoreTimeDecrement+1)){	
+			maxScoreTime -= scoreTimeDecrement;
+			if(scoreTimeDecrement>1){
+				 scoreTimeDecrement = scoreTimeDecrement*SCORE_TIME_DECREMENT_DECREMENT;
+				 scoreTimeDecrement = scoreTimeDecrement>1?scoreTimeDecrement:1;
+				 System.out.println("scoreTimeDecrement = "+scoreTimeDecrement);
+			}
+			else {
+				scoreTimeDecrement = 1;
+				System.out.println("scoreTimeDecrementelse");
+			}
+			
+		}else{
+			scoreValue +=DEFAULT_SCORE_VALUE_INCREMENT;
+		}
+	}
+	public static float getCurrentSpeed(){
+		return currentSpeed;
+	}
 
 
 

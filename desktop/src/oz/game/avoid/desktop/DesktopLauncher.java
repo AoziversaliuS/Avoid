@@ -13,7 +13,6 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		//接口实现
 		TextControl.setITextToImage(new DeskItextToImage());
-		
 //		config.width = 320;
 //		config.height = 640;
 		

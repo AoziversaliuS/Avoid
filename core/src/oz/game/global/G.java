@@ -14,13 +14,13 @@ public class G {
 	
 	public static final int REFER_SCREEN_WIDTH = 720,REFER_SCREEN_HEIGHT = 1280;
 	
-	/**LineActor和RectActor共用的speed.*/
-	private static float publicSpeed = 7;
-	private static float dSpeed = 1f;
-	public static float getSpeed(){return publicSpeed;}
-	/**增加公共速度publicSpeed*/
-	public static void increateSpeed(){publicSpeed += dSpeed;}
-	public static void resetSpeed(){ publicSpeed = 7;}
+//	/**LineActor和RectActor共用的speed.*/
+//	private static float publicSpeed = 7;
+//	private static float dSpeed = 1f;
+//	public static float getSpeed(){return publicSpeed;}
+//	/**增加公共速度publicSpeed*/
+//	public static void increateSpeed(){publicSpeed += dSpeed;}
+//	public static void resetSpeed(){ publicSpeed = 7;}
 
 	private static boolean useNextColor = false;
 	private static boolean replaceColorFinish = false;
