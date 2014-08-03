@@ -78,10 +78,16 @@ public class OzFont extends OzActor{
 	}
 	
 	public float getFontWidth(){
-		return font.getBounds(wordsWillBeUse).width;
+		if(extraText==null){
+			return font.getBounds(wordsWillBeUse).width;
+		}
+		return font.getBounds(extraText).width;
 	}
 	public float getFontHeight(){
-		return font.getBounds(wordsWillBeUse).height;
+		if(extraText==null){
+			return font.getBounds(wordsWillBeUse).height;
+		}
+		return font.getBounds(extraText).height;
 	}
 	/**这里输入的字符必须在text里有才能正常显示,设置完后会替换掉先前的extraText.*/
 	public void setExtraText(String extraText) {
@@ -117,6 +123,16 @@ public class OzFont extends OzActor{
 	@Override
 	public void setY(float y) {
 		super.setY(y);
+		refreshBgBounds();
+	}
+	@Override
+	public void setPosition(float x, float y) {
+		super.setPosition(x, y);
+		refreshBgBounds();
+	}
+	@Override
+	public void setCenterPosition(float x, float y) {
+		super.setCenterPosition(x, y);
 		refreshBgBounds();
 	}
 	

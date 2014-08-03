@@ -13,12 +13,14 @@ import oz.game.base.fontutils.TextControl;
 public class AndroidLauncher extends AndroidApplication {
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
+
 		//设置屏幕常亮
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 
 				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		super.onCreate(savedInstanceState);
 		//接口实现
 		TextControl.setITextToImage(new AndroidItextToImage());
+		super.onCreate(savedInstanceState);
+
 		
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new MyGdxGame(), config);

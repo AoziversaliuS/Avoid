@@ -2,6 +2,7 @@ package oz.game.screen;
 
 import java.util.ArrayList;
 
+import javafx.scene.Group;
 import oz.game.actor.BallActor;
 import oz.game.actor.LineActor;
 import oz.game.actor.RectActor;
@@ -14,6 +15,7 @@ import oz.game.global.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,6 +24,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
@@ -37,6 +42,8 @@ public class GameScreen extends OzScreen {
 	/**计分累加值的递增值*/private static final int DEFAULT_SCORE_VALUE_INCREMENT = 2;
 	/**速度的增量*/private static final float INCREMENT_SPEED = 1F;
 	/**下拉框出现和消失时的耗时*/private static final float PAUSE_SHOW_TIME = 0.1f;
+	/**gameOver弹框宽*/private static final float GAMEOVER_WINDOWS_WIDTH = G.REFER_SCREEN_WIDTH;
+	/**gameOver弹框高*/private static final float GAMEOVER_WINDOWS_HEIGHT = 500;
     private Image backGround;
 	private BallActor ball;
 	private RectActor rectA;
@@ -44,6 +51,10 @@ public class GameScreen extends OzScreen {
 	private RectActor rectC;
 	private RectActor rectD;
 	private static float currentSpeed;
+	/**里面有ABCD*/
+	private ArrayList<RectActor> rects;
+	private LineActor line;
+	
 	/**计分板*/
 	private OzFont scoreFont;
 	private static int currentScore;
@@ -54,20 +65,22 @@ public class GameScreen extends OzScreen {
 	private static float scoreTimeDecrement;
 	private static boolean useNextColor = false;
 	private static boolean replaceColorFinish = false;
-	/**里面有ABCD*/
-	private ArrayList<RectActor> rects;
-	private LineActor line;
+
 
 	/**游戏状态,暂停和游戏状态*/
 	private int status;
-	
+	//暂停菜单
 	private ImageButton pauseBtn;
 	private Image pauseWindowBg;
 	private ImageButton resumeBtn;
 	private ImageButton restartBtn;
 	private ImageButton mainBtn;
-	int i=0;
-
+	//gameover弹框
+	private Window gameOverWindow;
+	private ImageButton shareBtn;
+	private ImageButton againBtn;
+	private ImageButton mainbBtn;
+	
 	public GameScreen(MyGdxGame game, String currentScreenName) {
 		super(game, currentScreenName);
 		setDefaultStage();
@@ -80,6 +93,27 @@ public class GameScreen extends OzScreen {
 		resumeBtn= new ImageButton(newTRDrawable("image/pause/resumeUp.png"), newTRDrawable("image/pause/resumeDown.png"));
 		restartBtn = new ImageButton(newTRDrawable("image/pause/restartUp.png"), newTRDrawable("image/pause/restartDown.png"));
 		mainBtn =  new ImageButton(newTRDrawable("image/pause/mainUp.png"), newTRDrawable("image/pause/mainDown.png"));
+		//gameOver弹框
+		WindowStyle windowStyle = new WindowStyle(newBitmapFont("您的得分为:",60),Color.BLACK,newTRDrawable("image/gameover/gameOverBg.png"));
+		gameOverWindow = new Window("GameOver!", windowStyle);
+		gameOverWindow.setSize(GAMEOVER_WINDOWS_WIDTH,GAMEOVER_WINDOWS_HEIGHT);
+		gameOverWindow.setScale(0);
+		gameOverWindow.setOrigin(gameOverWindow.getCenterX(), gameOverWindow.getCenterY());
+		gameOverWindow.setCenterPosition(G.REFER_SCREEN_WIDTH/2,(G.REFER_SCREEN_HEIGHT-getOutOfScreenSize())/2);
+		gameOverWindow.setTitleAlignment(Align.top);
+		shareBtn = new ImageButton(newTRDrawable("image/gameover/shareBtnUp.png"), newTRDrawable("image/gameover/shareBtnDown.png"));
+		shareBtn.setY(25);
+		againBtn = new ImageButton(newTRDrawable("image/gameover/againBtnUp.png"), newTRDrawable("image/gameover/againBtnDown.png"));
+		againBtn.setPosition(shareBtn.getRight(), shareBtn.getY());
+		mainbBtn = new ImageButton(newTRDrawable("image/gameover/mainbUp.png"), newTRDrawable("image/gameover/mainbDown.png"));
+		mainbBtn.setPosition(againBtn.getRight(), againBtn.getY());
+		gameOverWindow.addActor(shareBtn);
+		gameOverWindow.addActor(againBtn);
+		gameOverWindow.addActor(mainbBtn);
+		gameOverWindow.addAction(Actions.scaleTo(1f, 1f, 0.5f));
+		OzFont test = new OzFont("本次得分: 3306",60, Color.WHITE, newTexture(1, 1, Color.BLACK));
+		test.setPosition(GAMEOVER_WINDOWS_WIDTH/2- test.getFontWidth()/2, 325);
+		gameOverWindow.addActor(test);
 		addEvent();
 	}
 	@Override
@@ -122,6 +156,7 @@ public class GameScreen extends OzScreen {
 		stage.addActor(rectC);
 		stage.addActor(rectD);
 		stage.addActor(ball);
+		stage.addActor(gameOverWindow);
 		Vector2 pauseBtnPosition = screenToStageCoordinates(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 		pauseBtnPosition.x -= pauseBtn.getWidth();
 		pauseBtnPosition.y -= pauseBtn.getHeight();
@@ -134,6 +169,7 @@ public class GameScreen extends OzScreen {
 		stage.addActor(resumeBtn);
 		stage.addActor(restartBtn);
 		stage.addActor(mainBtn);
+
 	}
 	@Override
 	public void addEvent() {
