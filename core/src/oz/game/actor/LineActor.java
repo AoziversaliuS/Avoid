@@ -69,7 +69,7 @@ public class LineActor extends OzActor{
 		}
 		if(impact(ball)){
 			if(!impacted){
-				G.setUseNextColor(true);
+				GameScreen.setUseNextColor(true);
 				GameScreen.increateSpeed();
 				impacted = true;
 			}

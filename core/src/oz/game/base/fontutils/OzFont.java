@@ -14,43 +14,43 @@ public class OzFont extends OzActor{
 	private BitmapFont font;
 	private Texture backGround;
 	
-	private String text;
-	private String extraText = null;
+	private String wordsWillBeUse;
+	private StringBuilder extraText = null;
 	
 	private float bgX;
 	private float bgY;
 	private float bgWidth;
 	private float bgHeight;
 	
-	public OzFont(float x,float y,String text,int fontSize,Color color,Texture backGround) {
-		this.text = text;
+	public OzFont(float x,float y,String wordsWillBeUse,int fontSize,Color color,Texture backGround) {
+		this.wordsWillBeUse = wordsWillBeUse;
 		setColor(color);
-		this.font = newBitmapFont(text, fontSize,color);
+		this.font = newBitmapFont(wordsWillBeUse, fontSize,color);
 		this.backGround = backGround;
 		setX(x);
 		setY(y);
 	}
-	public OzFont(float x,float y,String text,int fontSize,Texture backGround) {
-		this(x,y,text,fontSize,Color.WHITE,backGround);
+	public OzFont(float x,float y,String wordsWillBeUse,int fontSize,Texture backGround) {
+		this(x,y,wordsWillBeUse,fontSize,Color.WHITE,backGround);
 	}
-	public OzFont(float x,float y,String text,int fontSize) {
-		this(x,y,text,fontSize,Color.WHITE,null);
+	public OzFont(float x,float y,String wordsWillBeUse,int fontSize) {
+		this(x,y,wordsWillBeUse,fontSize,Color.WHITE,null);
 	}
-	public OzFont(String text,int fontSize,Color color,Texture backGround) {
-		this(0,0,text,fontSize,color,backGround);
+	public OzFont(String wordsWillBeUse,int fontSize,Color color,Texture backGround) {
+		this(0,0,wordsWillBeUse,fontSize,color,backGround);
 	}
-	public OzFont(String text,int fontSize,Texture backGround) {
-		this(text,fontSize,Color.WHITE,backGround);
+	public OzFont(String wordsWillBeUse,int fontSize,Texture backGround) {
+		this(wordsWillBeUse,fontSize,Color.WHITE,backGround);
 	}
-	public OzFont(String text,int fontSize) {
-		this(text,fontSize,Color.WHITE,null);
+	public OzFont(String wordsWillBeUse,int fontSize) {
+		this(wordsWillBeUse,fontSize,Color.WHITE,null);
 	}
 	
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		if(backGround!=null) batch.draw(backGround, bgX,bgY, bgWidth,bgHeight);
-		if(extraText==null)  font.draw(batch, text,getX(),getY());
+		if(extraText==null)  font.draw(batch, wordsWillBeUse,getX(),getY());
 		else                 font.draw(batch, extraText,getX(),getY());
 	}
 	/**设置偏移值*/
@@ -78,14 +78,19 @@ public class OzFont extends OzActor{
 	}
 	
 	public float getFontWidth(){
-		return font.getBounds(text).width;
+		return font.getBounds(wordsWillBeUse).width;
 	}
 	public float getFontHeight(){
-		return font.getBounds(text).height;
+		return font.getBounds(wordsWillBeUse).height;
 	}
-	/**这里输入的字符必须在text里有才能正常显示*/
+	/**这里输入的字符必须在text里有才能正常显示,设置完后会替换掉先前的extraText.*/
 	public void setExtraText(String extraText) {
-		this.extraText = extraText;
+		if(this.extraText==null){
+				this.extraText = new StringBuilder(extraText);
+		}
+		else{
+			this.extraText.replace(0,  this.extraText.length(), extraText);
+		}
 		refreshBgBounds();
 	}
 	/**刷新背景*/
@@ -96,11 +101,11 @@ public class OzFont extends OzActor{
 			bgX = getX();
 			bgY = getY()-font.getBounds(extraText).height;
 		}
-		else if(text!=null){
-			bgWidth = font.getBounds(text).width;
-			bgHeight = font.getBounds(text).height;
+		else if(wordsWillBeUse!=null){
+			bgWidth = font.getBounds(wordsWillBeUse).width;
+			bgHeight = font.getBounds(wordsWillBeUse).height;
 			bgX = getX();
-			bgY = getY()-font.getBounds(text).height;
+			bgY = getY()-font.getBounds(wordsWillBeUse).height;
 		}
 	}
 	

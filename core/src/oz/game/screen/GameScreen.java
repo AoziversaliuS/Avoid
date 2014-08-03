@@ -36,7 +36,7 @@ public class GameScreen extends OzScreen {
 	/**默认的每一次计分被累加的分值*/private static final int DEFAULT_SCORE_VALUE = 1;
 	/**计分累加值的递增值*/private static final int DEFAULT_SCORE_VALUE_INCREMENT = 2;
 	/**速度的增量*/private static final float INCREMENT_SPEED = 1F;
-	private static final float PAUSE_SHOW_TIME = 0.25f;
+	/**下拉框出现和消失时的耗时*/private static final float PAUSE_SHOW_TIME = 0.1f;
     private Image backGround;
 	private BallActor ball;
 	private RectActor rectA;
@@ -52,6 +52,8 @@ public class GameScreen extends OzScreen {
 	private static float currentScoreTime;
 	private static float maxScoreTime;
 	private static float scoreTimeDecrement;
+	private static boolean useNextColor = false;
+	private static boolean replaceColorFinish = false;
 	/**里面有ABCD*/
 	private ArrayList<RectActor> rects;
 	private LineActor line;
@@ -288,19 +290,19 @@ public class GameScreen extends OzScreen {
 				&& rectC.replaceColorFinish()
 				&& rectD.replaceColorFinish()
 				){
-			G.setReplaceColorFinish(true);
+			setReplaceColorFinish(true);
 		}
-		if(G.isUseNextColor()){
-			if(G.isReplaceColorFinish()){
+		if(isUseNextColor()){
+			if(isReplaceColorFinish()){
 				line.replaceColor(getRandomColor());
 				Color rectColor = getRandomColor();
 				rectA.replaceColor(rectColor);
 				rectB.replaceColor(rectColor);
 				rectC.replaceColor(rectColor);
 				rectD.replaceColor(rectColor);
-				G.setReplaceColorFinish(false);
+				setReplaceColorFinish(false);
 			}
-			G.setUseNextColor(false);
+			setUseNextColor(false);
 		}
 		if(currentScoreTime>=maxScoreTime){
 			currentScoreTime = 0;
@@ -309,23 +311,20 @@ public class GameScreen extends OzScreen {
 		else{
 			currentScoreTime++;
 		}
-		
 		scoreFont.setExtraText("得分: "+currentScore);
 		stage.draw();
 	}
 
 	@Override
 	public boolean end(float delta) {
-//		stage.act();在此不需再执行逻辑
 		stage.draw();
 		setDarkness(darkAlpha);
-//		stage.getActors().clear();
 		darkAlpha += dAlpha;
 		if(darkAlpha<1){
 			
 			return false;
 		}
-//		darkAlpha -=0.2f;
+		darkAlpha = 1;
 		return true;
 	}
 
@@ -383,6 +382,13 @@ public class GameScreen extends OzScreen {
 	public static float getCurrentSpeed(){
 		return currentSpeed;
 	}
+
+	/**当转变颜色完成之后才允许进行下一次颜色的更换*/
+	public static boolean isReplaceColorFinish() {return replaceColorFinish;}
+	public static void setReplaceColorFinish(boolean replaceColorFinish) {GameScreen.replaceColorFinish = replaceColorFinish;}
+	/**设置是否要更换颜色*/
+	public static boolean isUseNextColor() {return useNextColor;}
+	public static void setUseNextColor(boolean useNextColor) {GameScreen.useNextColor = useNextColor;}
 
 
 

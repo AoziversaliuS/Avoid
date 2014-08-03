@@ -22,14 +22,14 @@ public class G {
 //	public static void increateSpeed(){publicSpeed += dSpeed;}
 //	public static void resetSpeed(){ publicSpeed = 7;}
 
-	private static boolean useNextColor = false;
-	private static boolean replaceColorFinish = false;
-	/**当转变颜色完成之后才允许进行下一次颜色的更换*/
-	public static boolean isReplaceColorFinish() {return replaceColorFinish;}
-	public static void setReplaceColorFinish(boolean replaceColorFinish) {G.replaceColorFinish = replaceColorFinish;}
-	/**设置是否要更换颜色*/
-	public static boolean isUseNextColor() {return useNextColor;}
-	public static void setUseNextColor(boolean useNextColor) {G.useNextColor = useNextColor;}
+//	private static boolean useNextColor = false;
+//	private static boolean replaceColorFinish = false;
+//	/**当转变颜色完成之后才允许进行下一次颜色的更换*/
+//	public static boolean isReplaceColorFinish() {return replaceColorFinish;}
+//	public static void setReplaceColorFinish(boolean replaceColorFinish) {G.replaceColorFinish = replaceColorFinish;}
+//	/**设置是否要更换颜色*/
+//	public static boolean isUseNextColor() {return useNextColor;}
+//	public static void setUseNextColor(boolean useNextColor) {G.useNextColor = useNextColor;}
 	
 	public static final Color GAMESCREEN_BACKGROUND_COLOR = Color.BLACK;
 	public static final Color MAINSCREEN_BACKGROUND_COLOR = Color.GRAY;
