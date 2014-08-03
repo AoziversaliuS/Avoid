@@ -28,6 +28,7 @@ public class BallActor extends OzActor {
 	private MoveMode moveMode;
 	private float speed;
 	private int dir;
+	private boolean alive;
 	public BallActor(float centerX) {
 		setName("Ball");
 		this.radius = BALL_RADIUS;

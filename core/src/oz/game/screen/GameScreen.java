@@ -84,6 +84,7 @@ public class GameScreen extends OzScreen {
 	}
 	@Override
 	public void reset() {
+		//计分规则
 		scoreValue = DEFAULT_SCORE_VALUE;
 		currentScore = 0;
 		currentScoreTime = 0;
@@ -96,7 +97,7 @@ public class GameScreen extends OzScreen {
 		scoreFont.setX(fontPosition.x);
 		scoreFont.setY(fontPosition.y);
 		scoreFont.setExtraText("得分:");
-		
+		//游戏界面及状态初始化
 		status = STATUS_PLAY;
 		darkAlpha = 1;
 		stage.getActors().clear();
@@ -389,7 +390,7 @@ public class GameScreen extends OzScreen {
 	/**设置是否要更换颜色*/
 	public static boolean isUseNextColor() {return useNextColor;}
 	public static void setUseNextColor(boolean useNextColor) {GameScreen.useNextColor = useNextColor;}
-
+	
 
 
 }
