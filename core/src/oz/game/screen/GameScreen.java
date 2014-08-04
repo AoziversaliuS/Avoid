@@ -2,29 +2,33 @@ package oz.game.screen;
 
 import java.util.ArrayList;
 
+import javafx.scene.Group;
 import oz.game.actor.BallActor;
 import oz.game.actor.LineActor;
 import oz.game.actor.RectActor;
 import oz.game.avoid.MyGdxGame;
 import oz.game.base.OzScreen;
 import oz.game.base.fontutils.OzFont;
-import oz.game.global.G;
-import oz.game.global.ResManager;
-import oz.game.global.Screens;
-import static oz.game.global.ResManager.*;
 import static oz.game.base.OzUtils.*;
+import oz.game.global.G;
+import oz.game.global.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
 
 public class GameScreen extends OzScreen {
 
@@ -82,29 +86,29 @@ public class GameScreen extends OzScreen {
 	public GameScreen(MyGdxGame game, String currentScreenName) {
 		super(game, currentScreenName);
 		setDefaultStage();
-	}
-	@Override
-	public void load() {
-		backGround = new Image(newTextureByManager(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.GAMESCREEN_BACKGROUND_COLOR));
-		pauseBtn = new ImageButton(newTRDrawableByManager("image/pause/pauseUp.png"),
-				newTRDrawableByManager("image/pause/pauseDown.png"));
-		pauseWindowBg = new Image(newTRDrawableByManager(newTextureByManager(G.REFER_SCREEN_WIDTH, 125, Color.WHITE)));
-		resumeBtn= new ImageButton(newTRDrawableByManager("image/pause/resumeUp.png"), newTRDrawableByManager("image/pause/resumeDown.png"));
-		restartBtn = new ImageButton(newTRDrawableByManager("image/pause/restartUp.png"), newTRDrawableByManager("image/pause/restartDown.png"));
-		mainBtn =  new ImageButton(newTRDrawableByManager("image/pause/mainbUp.png"), newTRDrawableByManager("image/pause/mainbDown.png"));
+		backGround = new Image(newTexture(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.GAMESCREEN_BACKGROUND_COLOR));
+
+		pauseBtn = new ImageButton(newTRDrawable("image/pause/pauseUp.png"),
+				newTRDrawable("image/pause/pauseDown.png"));
+		pauseWindowBg = new Image(newTRDrawable(newTexture(G.REFER_SCREEN_WIDTH, 125, Color.WHITE)));
+		resumeBtn= new ImageButton(newTRDrawable("image/pause/resumeUp.png"), newTRDrawable("image/pause/resumeDown.png"));
+		restartBtn = new ImageButton(newTRDrawable("image/pause/restartUp.png"), newTRDrawable("image/pause/restartDown.png"));
+		mainBtn =  new ImageButton(newTRDrawable("image/pause/mainbUp.png"), newTRDrawable("image/pause/mainbDown.png"));
 		//gameOver弹框
-		WindowStyle windowStyle = new WindowStyle(newBitmapFontByManager("您的得分为:",60),Color.BLACK,newTRDrawableByManager("image/gameover/gameOverBg.png"));
+		WindowStyle windowStyle = new WindowStyle(newBitmapFont("您的得分为:",60),Color.BLACK,newTRDrawable("image/gameover/gameOverBg.png"));
 		gameOverWindow = new Window("GameOver!", windowStyle);
 		gameOverWindow.setSize(GAMEOVER_WINDOWS_WIDTH,GAMEOVER_WINDOWS_HEIGHT);
 		gameOverWindow.setOrigin(gameOverWindow.getCenterX(), gameOverWindow.getCenterY());
 		gameOverWindow.setCenterPosition(G.REFER_SCREEN_WIDTH/2,(G.REFER_SCREEN_HEIGHT-getOutOfScreenSize())/2);
 		gameOverWindow.setTitleAlignment(Align.top);
-		shareBtn = new ImageButton(newTRDrawableByManager("image/gameover/shareBtnUp.png"), newTRDrawableByManager("image/gameover/shareBtnDown.png"));
+		shareBtn = new ImageButton(newTRDrawable("image/gameover/shareBtnUp.png"), newTRDrawable("image/gameover/shareBtnDown.png"));
 		shareBtn.setY(25);
-		againBtn = new ImageButton(newTRDrawableByManager("image/gameover/againBtnUp.png"), newTRDrawableByManager("image/gameover/againBtnDown.png"));
+		againBtn = new ImageButton(newTRDrawable("image/gameover/againBtnUp.png"), newTRDrawable("image/gameover/againBtnDown.png"));
 		againBtn.setPosition(shareBtn.getRight(), shareBtn.getY());
-		mainbBtn = new ImageButton(newTRDrawableByManager("image/gameover/mainbUp.png"), newTRDrawableByManager("image/gameover/mainbDown.png"));
+		mainbBtn = new ImageButton(newTRDrawable("image/gameover/mainbUp.png"), newTRDrawable("image/gameover/mainbDown.png"));
 		mainbBtn.setPosition(againBtn.getRight(), againBtn.getY());
+		
+		addEvent();
 	}
 	@Override
 	public void reset() {
@@ -114,7 +118,7 @@ public class GameScreen extends OzScreen {
 		gameOverWindow.addActor(shareBtn);
 		gameOverWindow.addActor(againBtn);
 		gameOverWindow.addActor(mainbBtn);
-		gameOverScoreText = new OzFont("本次得分", 55, newTextureByManager(1, 1, Color.BLACK));
+		gameOverScoreText = new OzFont("本次得分", 55, newTexture(1, 1, Color.BLACK));
 		//计分规则
 		scoreValue = DEFAULT_SCORE_VALUE;
 		currentScore = 0;
@@ -122,7 +126,7 @@ public class GameScreen extends OzScreen {
 		maxScoreTime = DEFAULT_SCORE_TIME;
 		currentSpeed = DEFAULT_SPEED;
 		scoreTimeDecrement = DEFAULT_SCORE_TIME_DECREMENT;
-		scoreFont = new OzFont("得分",50, Color.BLACK, newTextureByManager(1, 1, Color.WHITE ));
+		scoreFont = new OzFont("得分",50, Color.BLACK, newTexture(1, 1, Color.WHITE ));
 		Vector2 fontPosition = screenToStageCoordinates(0, Gdx.graphics.getHeight());
 		fontPosition.y -= scoreFont.getFontHeight()*2;
 		scoreFont.setX(fontPosition.x);
@@ -399,21 +403,18 @@ public class GameScreen extends OzScreen {
 
 	@Override
 	public void hide() {
-		Gdx.app.log("OZstatus", " hide()");
-		ResManager.dispose();
 		drawDarkness(1f);
 	}
 
 	@Override
 	public void pause() {
-		ResManager.dispose();
-		Gdx.app.log("OZstatus", " pause()");
+		
 	}
 
 	@Override
 	public void resume() {
-		this.show();
-		Gdx.app.log("OZstatus", " resume()");
+		System.out.println("GameScreen.resume()");
+		
 	}
 	
 
@@ -484,7 +485,6 @@ public class GameScreen extends OzScreen {
 	/**设置是否要更换颜色*/
 	public static boolean isUseNextColor() {return useNextColor;}
 	public static void setUseNextColor(boolean useNextColor) {GameScreen.useNextColor = useNextColor;}
-
 	
 	
 

@@ -63,10 +63,13 @@ public class LineActor extends OzActor{
 			if(getTop()<0){
 				count = 0;
 				setY(G.REFER_SCREEN_HEIGHT);
-				setX(getRandomX());
+				float RandomX = getRandomX();
+				setX(RandomX);
 			}
 			else{
-				setY(getY()-GameScreen.getCurrentSpeed());
+				float positionY = getY()-GameScreen.getCurrentSpeed();
+				System.out.println("LINE MOVE");
+				setY(positionY);
 			}
 		}
 		if(impact(ball)&&ball.isAlive()){

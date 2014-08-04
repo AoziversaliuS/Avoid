@@ -68,7 +68,8 @@ public class RectActor extends OzActor{
 			lastRectActor = this;//将此方块设置为最上面的那一个方块
 		}
 		else{
-			setY( getY()-GameScreen.getCurrentSpeed());
+			float positionY = getY()-GameScreen.getCurrentSpeed();
+			setY(positionY);
 		}
 		//碰撞检测
 		if(this.impact(ball)){
