@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 
 public class BallActor extends OzActor {
@@ -23,7 +24,8 @@ public class BallActor extends OzActor {
     /**空闲不动的值*/
     public static final int DIR_FREE = -100;
     
-	private Sprite ballSprite;
+	private Sprite ballSpriteA;
+	private Sprite ballSpriteB;
 	private float radius;
 	private MoveMode moveMode;
 	private float speed;
@@ -39,61 +41,79 @@ public class BallActor extends OzActor {
 		//通过中心点坐标来设置小球位置要在设置宽高之后
 		setCenterPosition(centerX, BALL_CENTER_Y);
 		
-		Texture ballTex = new Texture("image/ball.png");
-		ballTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		ballSprite = new Sprite(ballTex);
-		ballSprite.setSize(radius*2, radius*2);
-		ballSprite.setOriginCenter();
+		Texture ballTexA = new Texture("image/gameplay/ballA.png");
+		Texture ballTexB = new Texture("image/gameplay/ballB.png");
+		ballTexA.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		ballTexB.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		ballSpriteA = new Sprite(ballTexA);
+		ballSpriteA.setSize(radius*2, radius*2);
+		ballSpriteA.setOriginCenter();
+		ballSpriteB = new Sprite(ballTexB);
+		ballSpriteB.setSize(radius*2, radius*2);
+		ballSpriteB.setOriginCenter();
 		//设置移动方式
 		moveMode = new AccelerateMove(speed);
+		alive = true;
 	}
 
 	@Override
 	public void logic(float delta) {
-		//手机版重力感应
-		float nextPositionX = getX()+moveMode.getDx();
-		//如果小球移动之后的坐标还位于屏幕之内,则让小球移动对应的距离,否则将小球设置在边缘
-		float dx = 0;//左正右负
-		if(nextPositionX<0){
-			dx = getX();//左为正
-			setX(0);
-		}
-		else if((nextPositionX+getWidth())>G.REFER_SCREEN_WIDTH){
-			dx =getRight() - G.REFER_SCREEN_WIDTH;//右为负
-			setX(G.REFER_SCREEN_WIDTH-getWidth());
-		}
-		else{
-			dx = getX() - nextPositionX;
-			setX(nextPositionX);
-		}
-		//PC版按键移动
-		if(dir==DIR_LEFT){
-			if(getX()-BALL_PC_SPEED<0){
+		if(alive){
+			//手机版重力感应
+			float nextPositionX = getX()+moveMode.getDx();
+			//如果小球移动之后的坐标还位于屏幕之内,则让小球移动对应的距离,否则将小球设置在边缘
+			float dx = 0;//左正右负
+			if(nextPositionX<0){
 				dx = getX();//左为正
 				setX(0);
 			}
-			else{
-				dx = BALL_PC_SPEED;
-				setX(getX()-BALL_PC_SPEED);
-			}
-		}
-		else if(dir==DIR_RIGHT){
-			if((getRight()+BALL_PC_SPEED)>G.REFER_SCREEN_WIDTH){
+			else if((nextPositionX+getWidth())>G.REFER_SCREEN_WIDTH){
 				dx =getRight() - G.REFER_SCREEN_WIDTH;//右为负
 				setX(G.REFER_SCREEN_WIDTH-getWidth());
 			}
 			else{
-				dx = -BALL_PC_SPEED;
-				setX(getX()+BALL_PC_SPEED);
+				dx = getX() - nextPositionX;
+				setX(nextPositionX);
 			}
+			//PC版按键移动
+			if(dir==DIR_LEFT){
+				if(getX()-BALL_PC_SPEED<0){
+					dx = getX();//左为正
+					setX(0);
+				}
+				else{
+					dx = BALL_PC_SPEED;
+					setX(getX()-BALL_PC_SPEED);
+				}
+			}
+			else if(dir==DIR_RIGHT){
+				if((getRight()+BALL_PC_SPEED)>G.REFER_SCREEN_WIDTH){
+					dx =getRight() - G.REFER_SCREEN_WIDTH;//右为负
+					setX(G.REFER_SCREEN_WIDTH-getWidth());
+				}
+				else{
+					dx = -BALL_PC_SPEED;
+					setX(getX()+BALL_PC_SPEED);
+				}
+			}
+			setRotation(getRotation()+getDegrees(dx));
 		}
-		setRotation(getRotation()+getDegrees(dx));
+		else{
+			System.out.println("getWidth = "+getScaleX());
+			ballSpriteA.setScale(getScaleX(), getScaleY());
+			ballSpriteB.setScale((100-getScaleX())/100);
+		}
+		
 	}
+
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		ballSprite.setPosition(getX(), getY());
-		ballSprite.setRotation(getRotation());
-		ballSprite.draw(batch);
+		ballSpriteB.setPosition(getX(), getY());
+		ballSpriteB.setRotation(getRotation());
+		ballSpriteB.draw(batch);
+		ballSpriteA.setPosition(getX(), getY());
+		ballSpriteA.setRotation(getRotation());
+		ballSpriteA.draw(batch);
 	}
 	
 	/**根据弧度(移动的距离)获取角度,小球左移弧度为正,右移弧度为负
@@ -120,6 +140,17 @@ public class BallActor extends OzActor {
 
 	public void setDir(int dir) {
 		this.dir = dir;
+	}
+
+	public boolean isAlive() {
+		return alive;
+	}
+
+	public void setAlive(boolean alive) {
+		if(this.alive){
+			this.addAction(Actions.scaleTo(100, 100, 1f));
+		}
+		this.alive = alive;
 	}
 	
 
