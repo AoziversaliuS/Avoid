@@ -2,8 +2,10 @@ package oz.game.actor;
 
 import oz.game.base.MoveMode;
 import oz.game.base.OzActor;
+import oz.game.base.OzScreen;
 import oz.game.global.G;
 import oz.game.movemode.AccelerateMove;
+import oz.game.screen.GameScreen;
 
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -17,6 +19,8 @@ public class BallActor extends OzActor {
     private static final float BALL_CENTER_Y = 100;
     private static final float BALL_RADIUS = 30;
     private static final float BALL_SPEED = 5F;
+    private static final float SCALE_SIZE = 100;
+    private static final float SCALE_SPEED = 1F;
     /**PC版的移动速度*/
     private static final float BALL_PC_SPEED = BALL_SPEED*2-BALL_SPEED/2;
     public static final int DIR_LEFT = 21;
@@ -31,7 +35,9 @@ public class BallActor extends OzActor {
 	private float speed;
 	private int dir;
 	private boolean alive;
-	public BallActor(float centerX) {
+	private GameScreen screen;
+	public BallActor(float centerX,GameScreen screen) {
+		this.screen = screen;
 		setName("Ball");
 		this.radius = BALL_RADIUS;
 		this.speed = BALL_SPEED;
@@ -99,9 +105,11 @@ public class BallActor extends OzActor {
 			setRotation(getRotation()+getDegrees(dx));
 		}
 		else{
-			System.out.println("getWidth = "+getScaleX());
 			ballSpriteA.setScale(getScaleX(), getScaleY());
-			ballSpriteB.setScale((100-getScaleX())/100);
+			ballSpriteB.setScale((SCALE_SIZE-getScaleX())/SCALE_SIZE);
+			if(getScaleX()>=SCALE_SIZE){
+				screen.showGameOverWindow();
+			}
 		}
 		
 	}
@@ -148,7 +156,7 @@ public class BallActor extends OzActor {
 
 	public void setAlive(boolean alive) {
 		if(this.alive){
-			this.addAction(Actions.scaleTo(100, 100, 1f));
+			this.addAction(Actions.scaleTo(SCALE_SIZE, SCALE_SIZE, SCALE_SPEED));
 		}
 		this.alive = alive;
 	}

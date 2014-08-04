@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 import oz.game.action.ReplaceColorAction;
 import oz.game.base.OzActor;
+import oz.game.base.OzScreen;
 import oz.game.base.OzUtils;
 import oz.game.global.G;
 import oz.game.screen.GameScreen;
@@ -35,9 +36,10 @@ public class LineActor extends OzActor{
 	/**判断是否已经触碰过了,若已经触碰过了则忽视此次触碰*/
 	private boolean impacted;
 	private ReplaceColorAction replaceColorAction;
+	private GameScreen screen;
 
-
-	public LineActor() {
+	public LineActor(GameScreen screen) {
+		this.screen = screen;
 		setWidth(WIDTH);
 		setHeight(HEIGHT);
 		setX(getRandomX());
@@ -67,7 +69,7 @@ public class LineActor extends OzActor{
 				setY(getY()-GameScreen.getCurrentSpeed());
 			}
 		}
-		if(impact(ball)){
+		if(impact(ball)&&ball.isAlive()){
 			if(!impacted){
 				GameScreen.setUseNextColor(true);
 				GameScreen.increateSpeed();

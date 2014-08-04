@@ -4,9 +4,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 import oz.game.action.ReplaceColorAction;
 import oz.game.base.OzActor;
+import oz.game.base.OzScreen;
 import oz.game.base.OzUtils;
 import oz.game.global.G;
 import oz.game.screen.GameScreen;
@@ -26,19 +28,19 @@ public class RectActor extends OzActor{
 	private Sprite rectSpriteA;
 	private Sprite rectSpriteB;
 	private ReplaceColorAction replaceColorAction;
+	private GameScreen screen;
 	
 	
-	
-	public RectActor(float centerX,float centerY,Color color) {
-		this(color);
+	public RectActor(float centerX,float centerY,Color color,GameScreen screen) {
+		this(color,screen);
 		setCenterPosition(centerX, centerY);
 	}
-	public RectActor(float centerY,Color color) {
-		this(color);
+	public RectActor(float centerY,Color color,GameScreen screen) {
+		this(color,screen);
 		setCenterPosition(getRandomCenterX(), centerY);
 	}
-	public RectActor(RectActor referRectActor,Color color) {
-		this(color);
+	public RectActor(RectActor referRectActor,Color color,GameScreen screen) {
+		this(color,screen);
 		setX(getRandomX());
 		setY(referRectActor.getTop()+NEXT_RECT_LIMIT_Y);
 		//设置此方块为最上面的那个方块
@@ -46,7 +48,8 @@ public class RectActor extends OzActor{
 	}
 	
 
-	public RectActor(Color color) {
+	public RectActor(Color color,GameScreen screen) {
+		this.screen = screen;
 		setWidth(WIDTH);
 		setHeight(HEIGHT);
 		setColor(color);
@@ -69,7 +72,12 @@ public class RectActor extends OzActor{
 		}
 		//碰撞检测
 		if(this.impact(ball)){
-			ball.setAlive(false);
+			if(ball.isAlive()){
+				ball.setAlive(false);
+				float duration = 0.5f;
+				screen.getPauseBtn().addAction(Actions.moveTo(G.REFER_SCREEN_WIDTH, screen.getPauseBtn().getY(), duration));
+				screen.getScoreFont().addAction(Actions.moveTo(-screen.getScoreFont().getFontWidth(),screen.getScoreFont().getY(), duration));
+			}
 		}
 	}
 	

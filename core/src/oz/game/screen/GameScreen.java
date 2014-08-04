@@ -80,11 +80,12 @@ public class GameScreen extends OzScreen {
 	private ImageButton shareBtn;
 	private ImageButton againBtn;
 	private ImageButton mainbBtn;
+	/**显示最终得分*/
+	private OzFont gameOverScoreText;
 	
 	public GameScreen(MyGdxGame game, String currentScreenName) {
 		super(game, currentScreenName);
 		setDefaultStage();
-
 		backGround = new Image(newTexture(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.GAMESCREEN_BACKGROUND_COLOR));
 
 		pauseBtn = new ImageButton(newTRDrawable("image/pause/pauseUp.png"),
@@ -97,7 +98,6 @@ public class GameScreen extends OzScreen {
 		WindowStyle windowStyle = new WindowStyle(newBitmapFont("您的得分为:",60),Color.BLACK,newTRDrawable("image/gameover/gameOverBg.png"));
 		gameOverWindow = new Window("GameOver!", windowStyle);
 		gameOverWindow.setSize(GAMEOVER_WINDOWS_WIDTH,GAMEOVER_WINDOWS_HEIGHT);
-		gameOverWindow.setScale(0);
 		gameOverWindow.setOrigin(gameOverWindow.getCenterX(), gameOverWindow.getCenterY());
 		gameOverWindow.setCenterPosition(G.REFER_SCREEN_WIDTH/2,(G.REFER_SCREEN_HEIGHT-getOutOfScreenSize())/2);
 		gameOverWindow.setTitleAlignment(Align.top);
@@ -107,17 +107,18 @@ public class GameScreen extends OzScreen {
 		againBtn.setPosition(shareBtn.getRight(), shareBtn.getY());
 		mainbBtn = new ImageButton(newTRDrawable("image/gameover/mainbUp.png"), newTRDrawable("image/gameover/mainbDown.png"));
 		mainbBtn.setPosition(againBtn.getRight(), againBtn.getY());
-		gameOverWindow.addActor(shareBtn);
-		gameOverWindow.addActor(againBtn);
-		gameOverWindow.addActor(mainbBtn);
-//		gameOverWindow.addAction(Actions.scaleTo(1f, 1f, 0.5f));
-		OzFont test = new OzFont("本次得分: 3306",60, Color.WHITE, newTexture(1, 1, Color.BLACK));
-		test.setPosition(GAMEOVER_WINDOWS_WIDTH/2- test.getFontWidth()/2, 325);
-		gameOverWindow.addActor(test);
+		
 		addEvent();
 	}
 	@Override
 	public void reset() {
+		gameOverWindow.setVisible(false);
+		gameOverWindow.setScale(0);
+		gameOverWindow.clear();
+		gameOverWindow.addActor(shareBtn);
+		gameOverWindow.addActor(againBtn);
+		gameOverWindow.addActor(mainbBtn);
+		gameOverScoreText = new OzFont("本次得分", 55, newTexture(1, 1, Color.BLACK));
 		//计分规则
 		scoreValue = DEFAULT_SCORE_VALUE;
 		currentScore = 0;
@@ -136,17 +137,17 @@ public class GameScreen extends OzScreen {
 		darkAlpha = 1;
 		stage.getActors().clear();
 		Color rectColor = getRandomColor();
-		rectA = new RectActor(G.REFER_SCREEN_HEIGHT,rectColor);
-		rectB = new RectActor(rectA,rectColor);
-		rectC = new RectActor(rectB,rectColor);
-		rectD = new RectActor(rectC,rectColor);
-		ball = new BallActor(G.REFER_SCREEN_WIDTH/2);
+		rectA = new RectActor(G.REFER_SCREEN_HEIGHT,rectColor,this);
+		rectB = new RectActor(rectA,rectColor,this);
+		rectC = new RectActor(rectB,rectColor,this);
+		rectD = new RectActor(rectC,rectColor,this);
+		ball = new BallActor(G.REFER_SCREEN_WIDTH/2,this);
 		if(rects==null){
 			rects = new ArrayList<RectActor>();
 		}
 		rects.clear();
 		rects.add(rectA);rects.add(rectB);rects.add(rectC);rects.add(rectD);
-		line = new LineActor();
+		line = new LineActor(this);
 		LineActor.playWith(ball);
 		RectActor.playWith(ball);
 		stage.addActor(backGround);
@@ -156,7 +157,6 @@ public class GameScreen extends OzScreen {
 		stage.addActor(rectC);
 		stage.addActor(rectD);
 		stage.addActor(ball);
-		stage.addActor(gameOverWindow);
 		Vector2 pauseBtnPosition = screenToStageCoordinates(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 		pauseBtnPosition.x -= pauseBtn.getWidth();
 		pauseBtnPosition.y -= pauseBtn.getHeight();
@@ -169,7 +169,7 @@ public class GameScreen extends OzScreen {
 		stage.addActor(resumeBtn);
 		stage.addActor(restartBtn);
 		stage.addActor(mainBtn);
-
+		stage.addActor(gameOverWindow);
 	}
 	@Override
 	public void addEvent() {
@@ -248,13 +248,38 @@ public class GameScreen extends OzScreen {
 				}
 			}
 		});
+		againBtn.addListener(new InputListener(){
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				return true;
+			}
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+					int pointer, int button) {
+				if(x>0&&x<againBtn.getWidth()&&y>0&&y<againBtn.getHeight()){
+					setRefreshScreen(true);//重新进入此screen
+				}
+			}
+		});
 		mainBtn.addListener(new InputListener(){
 			public boolean touchDown(InputEvent event, float x, float y,
 					int pointer, int button) {return true;}
 			@Override
 			public void touchUp(InputEvent event, float x, float y,
 					int pointer, int button) {
-				if(x>0&&x<restartBtn.getWidth()&&y>0&&y<restartBtn.getHeight()){
+				if(x>0&&x<mainBtn.getWidth()&&y>0&&y<mainBtn.getHeight()){
+					setScreen(Screens.MAIN);
+				}
+			}
+		});
+		mainbBtn.addListener(new InputListener(){
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {return true;}
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+					int pointer, int button) {
+				if(x>0&&x<mainbBtn.getWidth()&&y>0&&y<mainbBtn.getHeight()){
 					setScreen(Screens.MAIN);
 				}
 			}
@@ -341,7 +366,8 @@ public class GameScreen extends OzScreen {
 			}
 			setUseNextColor(false);
 		}
-		if(currentScoreTime>=maxScoreTime){
+		if(currentScoreTime>=maxScoreTime&&ball.isAlive()){
+			//小球死亡时计分就会暂停
 			currentScoreTime = 0;
 			currentScore += scoreValue;
 		}
@@ -361,7 +387,7 @@ public class GameScreen extends OzScreen {
 			
 			return false;
 		}
-		darkAlpha = 1;
+		drawDarkness(1f);
 		return true;
 	}
 
@@ -397,6 +423,16 @@ public class GameScreen extends OzScreen {
 	public void dispose() {
 		
 	}
+	/**弹出GameOver窗体*/
+	public void showGameOverWindow(){
+		if(gameOverWindow.isVisible()==false){
+			gameOverWindow.setVisible(true);
+			gameOverScoreText.setExtraText("本次得分: "+currentScore);
+			gameOverScoreText.setPosition(GAMEOVER_WINDOWS_WIDTH/2- gameOverScoreText.getFontWidth()/2, 325);
+			gameOverWindow.addActor(gameOverScoreText);
+			gameOverWindow.addAction(Actions.scaleTo(1f, 1f, 0.5f));
+		}
+	}
 	/**加速并刷新积分增加规则*/
 	public static void increateSpeed(){
 		currentSpeed += INCREMENT_SPEED;
@@ -405,11 +441,9 @@ public class GameScreen extends OzScreen {
 			if(scoreTimeDecrement>1){
 				 scoreTimeDecrement = scoreTimeDecrement*SCORE_TIME_DECREMENT_DECREMENT;
 				 scoreTimeDecrement = scoreTimeDecrement>1?scoreTimeDecrement:1;
-				 System.out.println("scoreTimeDecrement = "+scoreTimeDecrement);
 			}
 			else {
 				scoreTimeDecrement = 1;
-				System.out.println("scoreTimeDecrementelse");
 			}
 			
 		}else{
@@ -419,7 +453,32 @@ public class GameScreen extends OzScreen {
 	public static float getCurrentSpeed(){
 		return currentSpeed;
 	}
+	
 
+	public BallActor getBall() {
+		return ball;
+	}
+	public void setBall(BallActor ball) {
+		this.ball = ball;
+	}
+	public ArrayList<RectActor> getRects() {
+		return rects;
+	}
+	public void setRects(ArrayList<RectActor> rects) {
+		this.rects = rects;
+	}
+	public OzFont getScoreFont() {
+		return scoreFont;
+	}
+	public void setScoreFont(OzFont scoreFont) {
+		this.scoreFont = scoreFont;
+	}
+	public ImageButton getPauseBtn() {
+		return pauseBtn;
+	}
+	public void setPauseBtn(ImageButton pauseBtn) {
+		this.pauseBtn = pauseBtn;
+	}
 	/**当转变颜色完成之后才允许进行下一次颜色的更换*/
 	public static boolean isReplaceColorFinish() {return replaceColorFinish;}
 	public static void setReplaceColorFinish(boolean replaceColorFinish) {GameScreen.replaceColorFinish = replaceColorFinish;}
@@ -427,6 +486,6 @@ public class GameScreen extends OzScreen {
 	public static boolean isUseNextColor() {return useNextColor;}
 	public static void setUseNextColor(boolean useNextColor) {GameScreen.useNextColor = useNextColor;}
 	
-
+	
 
 }
