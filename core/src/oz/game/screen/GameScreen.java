@@ -89,10 +89,10 @@ public class GameScreen extends OzScreen {
 
 		pauseBtn = new ImageButton(newTRDrawable("image/pause/pauseUp.png"),
 				newTRDrawable("image/pause/pauseDown.png"));
-		pauseWindowBg = new Image(newTRDrawable("image/pause/pauseBg.png"));
+		pauseWindowBg = new Image(newTRDrawable(newTexture(G.REFER_SCREEN_WIDTH, 125, Color.WHITE)));
 		resumeBtn= new ImageButton(newTRDrawable("image/pause/resumeUp.png"), newTRDrawable("image/pause/resumeDown.png"));
 		restartBtn = new ImageButton(newTRDrawable("image/pause/restartUp.png"), newTRDrawable("image/pause/restartDown.png"));
-		mainBtn =  new ImageButton(newTRDrawable("image/pause/mainUp.png"), newTRDrawable("image/pause/mainDown.png"));
+		mainBtn =  new ImageButton(newTRDrawable("image/pause/mainbUp.png"), newTRDrawable("image/pause/mainbDown.png"));
 		//gameOver弹框
 		WindowStyle windowStyle = new WindowStyle(newBitmapFont("您的得分为:",60),Color.BLACK,newTRDrawable("image/gameover/gameOverBg.png"));
 		gameOverWindow = new Window("GameOver!", windowStyle);
@@ -368,9 +368,9 @@ public class GameScreen extends OzScreen {
 
 	/**刷新暂停菜单里那三个按钮所处的位置*/
 	private void refreshPauseBtnsPosition(){
-		resumeBtn.setPosition(pauseWindowBg.getX()+14,pauseWindowBg.getY()+10);
-		restartBtn.setPosition(resumeBtn.getRight()+14, resumeBtn.getY());
-		mainBtn.setPosition(restartBtn.getRight()+14, resumeBtn.getY());
+		resumeBtn.setPosition(pauseWindowBg.getX(),pauseWindowBg.getY()+10);
+		restartBtn.setPosition(resumeBtn.getRight(), resumeBtn.getY());
+		mainBtn.setPosition(restartBtn.getRight(), resumeBtn.getY());
 	}
 	
 
