@@ -124,6 +124,7 @@ public abstract class OzScreen implements Screen{
 		toScreenName = currentScreenName;
 	     darkpic.setAlpha(0);
 	     this.load();
+	     this.addEvent();
 		this.reset();
 	}
 	

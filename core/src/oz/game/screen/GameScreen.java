@@ -9,9 +9,11 @@ import oz.game.avoid.MyGdxGame;
 import oz.game.base.OzScreen;
 import oz.game.base.fontutils.OzFont;
 import oz.game.global.G;
+import oz.game.global.ResManager;
 import oz.game.global.Screens;
 import static oz.game.global.ResManager.*;
 import static oz.game.base.OzUtils.*;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -398,16 +400,19 @@ public class GameScreen extends OzScreen {
 	@Override
 	public void hide() {
 		Gdx.app.log("OZstatus", " hide()");
+		ResManager.dispose();
 		drawDarkness(1f);
 	}
 
 	@Override
 	public void pause() {
+		ResManager.dispose();
 		Gdx.app.log("OZstatus", " pause()");
 	}
 
 	@Override
 	public void resume() {
+		this.show();
 		Gdx.app.log("OZstatus", " resume()");
 	}
 	

@@ -29,16 +29,24 @@ public class MainScreen extends OzScreen{
 	public MainScreen(MyGdxGame game, String currentScreenName) {
 		super(game, currentScreenName);
 		setDefaultStage();
+	}
+	@Override
+	public void load() {
 		backGround = new Image(newTextureByManager(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.MAINSCREEN_BACKGROUND_COLOR));
 		addTexture("startGameUp", newTextureByManager("image/startGameUp.png"));
 		addTexture("startGameDown",newTextureByManager("image/startGameDown.png"));
 		startGameBtn = new ImageButton(skin.newDrawable("startGameUp"),
 					skin.newDrawable("startGameDown"));
-		addEvent();
 	}
 	@Override
-	public void load() {
-		backGround = new Image(newTextureByManager(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.MAINSCREEN_BACKGROUND_COLOR));
+	public void reset() {
+		stage.getActors().clear();
+		stage.addActor(backGround);
+		stage.addActor(startGameBtn);
+		startGameBtn.setPosition(G.REFER_SCREEN_WIDTH, 500);
+//		startGameBtn.setPosition(0,1100);
+		startGameBtn.addAction(Actions.moveTo(0, 500, 0.5f));
+		darkAlpha = 1;
 	}
 	@Override
 	public void addEvent() {
@@ -60,17 +68,6 @@ public class MainScreen extends OzScreen{
 			}
 		});
 	}
-	@Override
-	public void reset() {
-		stage.getActors().clear();
-		stage.addActor(backGround);
-		stage.addActor(startGameBtn);
-		startGameBtn.setPosition(G.REFER_SCREEN_WIDTH, 500);
-//		startGameBtn.setPosition(0,1100);
-		startGameBtn.addAction(Actions.moveTo(0, 500, 0.5f));
-		darkAlpha = 1;
-	}
-	
 	
 	@Override
 	public boolean begin(float delta) {
