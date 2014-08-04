@@ -105,6 +105,11 @@ public class GameScreen extends OzScreen {
 		againBtn.setPosition(shareBtn.getRight(), shareBtn.getY());
 		mainbBtn = new ImageButton(newTRDrawableByManager("image/gameover/mainbUp.png"), newTRDrawableByManager("image/gameover/mainbDown.png"));
 		mainbBtn.setPosition(againBtn.getRight(), againBtn.getY());
+<<<<<<< HEAD
+=======
+		
+		addEvent();
+>>>>>>> parent of 2519c90... 资源管理
 	}
 	@Override
 	public void reset() {
