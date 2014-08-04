@@ -19,19 +19,19 @@ public class ResManager {
 	/**new出一个由ResManager管理的texture,长宽均为1*/
 	public static Texture newTextureByManager(Color color){
 		Texture texture = OzUtils.newTexture(1, 1, color);
-		textureArray.add(texture);
+		addTexture(texture);
 		return texture;
 	}
 	/**new出一个由ResManager管理的texture*/
 	public static Texture newTextureByManager(int width,int height,Color color){
 		Texture texture = OzUtils.newTexture(width, height, color);
-		textureArray.add(texture);
+		addTexture(texture);
 		return texture;
 	}
 	/**获取一个由ResManager管理的texture*/
 	public static Texture newTextureByManager(String internalPath){
 		Texture texture = new Texture(internalPath);
-		textureArray.add(texture);
+		addTexture(texture);
 		return texture;
 	}
 	/**获取一个支持中文的BitmapFont
@@ -40,7 +40,7 @@ public class ResManager {
 	 * @param color 字体颜色*/
 	public static BitmapFont newBitmapFontByManager(String text, int fontSize, Color color){
 		BitmapFont font = OzUtils.newBitmapFont(text, fontSize, color);
-		textureArray.add(font.getRegion().getTexture());
+		addTexture(font.getRegion().getTexture());
 		return font;
 	}
 	/**获取一个支持中文的BitmapFont,默认字体颜色为白色
@@ -50,13 +50,13 @@ public class ResManager {
 		return newBitmapFontByManager(text, fontSize, Color.WHITE);
 		
 	}
-	public static TextureRegionDrawable newTRDrawable(Texture texture){
-		textureArray.add(texture);
+	public static TextureRegionDrawable newTRDrawableByManager(Texture texture){
+		addTexture(texture);
 		return OzUtils.newTRDrawable(texture);
 	}
-	public static TextureRegionDrawable newTRDrawable(String internalPath){
+	public static TextureRegionDrawable newTRDrawableByManager(String internalPath){
 		TextureRegionDrawable drawable = OzUtils.newTRDrawable(internalPath);
-		textureArray.add(drawable.getRegion().getTexture());
+		addTexture(drawable.getRegion().getTexture());
 		return drawable;
 	}
 	/**dispose掉textureArray里所有的texture并清空textureArray*/
@@ -65,6 +65,19 @@ public class ResManager {
 			tex.dispose();
 		}
 		textureArray.clear();
+	}
+	/**将texture加入到textureArray里去,重复的不会被加载*/
+	private static void addTexture(Texture texture){
+		boolean had = false;
+		for(Texture t:textureArray){
+			if(t==texture){
+				had = true;
+				break;
+			}
+		}
+		if(!had){
+			textureArray.add(texture);
+		}
 	}
 
 	

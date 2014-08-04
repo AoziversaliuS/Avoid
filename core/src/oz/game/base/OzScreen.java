@@ -60,7 +60,7 @@ public abstract class OzScreen implements Screen{
 	     //默认设置背景颜色为黑色
 	}
 	
-	/**用于添加监听事件*/
+	/**用于添加监听事件,在show方法里会在load之后自动调用 */
 	public void addEvent(){
 		
 	}
@@ -71,9 +71,10 @@ public abstract class OzScreen implements Screen{
 	public abstract boolean end(float delta);
 	/**在此方法内处理逻辑和画图*/
 	public abstract void actAndDraw(float delta);
-	/**重设变量值等,在show方法里自动调用*/
+	/**重设变量值等,在show方法里最后自动调用*/
 	public abstract void reset();
-	
+	/**加载资源等,在show方法里自动调用(在reset调用之前被调用)*/
+	public abstract void load();
 	
 	@Override
 	public void render(float delta) {
@@ -117,10 +118,12 @@ public abstract class OzScreen implements Screen{
 	@Override
 	public void show() {
 		//重置值
+		Gdx.app.log("OZstatus", " show()");
 		began = false;
 		refreshScreen = false;
 		toScreenName = currentScreenName;
 	     darkpic.setAlpha(0);
+	     this.load();
 		this.reset();
 	}
 	
@@ -171,7 +174,7 @@ public abstract class OzScreen implements Screen{
 		darkpic2.draw(batch);
 		batch.end();
 	}
-	/**将Texture加到screen里,并设置抗锯齿*/
+	/**将Texture加到skin里,并设置抗锯齿*/
 	public void addTexture(String name,Texture texture){
 		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		skin.add(name, texture);

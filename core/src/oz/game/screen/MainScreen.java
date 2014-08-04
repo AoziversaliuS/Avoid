@@ -3,7 +3,8 @@ package oz.game.screen;
 
 import oz.game.avoid.MyGdxGame;
 import oz.game.base.OzScreen;
-import oz.game.base.OzUtils;
+//import oz.game.base.OzUtils;
+import static oz.game.global.ResManager.*;
 import oz.game.global.G;
 import oz.game.global.Screens;
 
@@ -27,29 +28,17 @@ public class MainScreen extends OzScreen{
 
 	public MainScreen(MyGdxGame game, String currentScreenName) {
 		super(game, currentScreenName);
-		ScalingViewport scalingView = new ScalingViewport(Scaling.fillX,G.REFER_SCREEN_WIDTH
-				,G.REFER_SCREEN_HEIGHT);
-		
-		stage = new Stage(scalingView);
-		System.out.println("cameraX : "+scalingView.getCamera().position.x+" cameraY : "+scalingView.getCamera().position.y);
-		Vector2 fullscreen = stage.screenToStageCoordinates(new Vector2(Gdx.graphics.getWidth(),0));
-		System.out.println("x = "+fullscreen.x+" y = "+fullscreen.y);
-		backGround = new Image(OzUtils.newTexture((int)fullscreen.x,(int)fullscreen.y,G.MAINSCREEN_BACKGROUND_COLOR));
-		addTexture("startGameUp", new Texture("image/startGameUp.png"));
-		addTexture("startGameDown",new Texture("image/startGameDown.png"));
+		setDefaultStage();
+		backGround = new Image(newTextureByManager(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.MAINSCREEN_BACKGROUND_COLOR));
+		addTexture("startGameUp", newTextureByManager("image/startGameUp.png"));
+		addTexture("startGameDown",newTextureByManager("image/startGameDown.png"));
 		startGameBtn = new ImageButton(skin.newDrawable("startGameUp"),
 					skin.newDrawable("startGameDown"));
-		
-		stage.addActor(backGround);
-		stage.addActor(startGameBtn);
 		addEvent();
 	}
 	@Override
-	public void reset() {
-		startGameBtn.setPosition(G.REFER_SCREEN_WIDTH, 500);
-//		startGameBtn.setPosition(0,1100);
-		startGameBtn.addAction(Actions.moveTo(0, 500, 0.5f));
-		darkAlpha = 1;
+	public void load() {
+		backGround = new Image(newTextureByManager(G.REFER_SCREEN_WIDTH,G.REFER_SCREEN_HEIGHT,G.MAINSCREEN_BACKGROUND_COLOR));
 	}
 	@Override
 	public void addEvent() {
@@ -71,6 +60,17 @@ public class MainScreen extends OzScreen{
 			}
 		});
 	}
+	@Override
+	public void reset() {
+		stage.getActors().clear();
+		stage.addActor(backGround);
+		stage.addActor(startGameBtn);
+		startGameBtn.setPosition(G.REFER_SCREEN_WIDTH, 500);
+//		startGameBtn.setPosition(0,1100);
+		startGameBtn.addAction(Actions.moveTo(0, 500, 0.5f));
+		darkAlpha = 1;
+	}
+	
 	
 	@Override
 	public boolean begin(float delta) {
@@ -123,5 +123,6 @@ public class MainScreen extends OzScreen{
 	@Override
 	public void dispose() {
 	}
+
 
 }
