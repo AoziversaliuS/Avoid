@@ -62,7 +62,7 @@ public class OzUtils {
 	}
 	/**获取一个支持中文的BitmapFont
 	 * @param text 之后需要显示的字符(可重复)
-	 * @param fontSize 字体大小
+	 * @param fontSize 字体大小,(英文字体大小大于76(中文不能大于70)在Android端无法显示)
 	 * @param 字体颜色*/
 	public static BitmapFont newBitmapFont(String text,int fontSize,Color color){
 		MyData data = TextControl.GetITextToImage().GetBitmapFontData(text+DEFAULT_CHARS, fontSize);

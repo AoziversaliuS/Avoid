@@ -107,7 +107,6 @@ public class GameScreen extends OzScreen {
 		againBtn.setPosition(shareBtn.getRight(), shareBtn.getY());
 		mainbBtn = new ImageButton(newTRDrawable("image/gameover/mainbUp.png"), newTRDrawable("image/gameover/mainbDown.png"));
 		mainbBtn.setPosition(againBtn.getRight(), againBtn.getY());
-		
 		addEvent();
 	}
 	@Override
