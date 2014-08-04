@@ -69,6 +69,7 @@ public class RectActor extends OzActor{
 		}
 		//碰撞检测
 		if(this.impact(ball)){
+			ball.setAlive(false);
 		}
 	}
 	

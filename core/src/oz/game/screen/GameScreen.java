@@ -110,7 +110,7 @@ public class GameScreen extends OzScreen {
 		gameOverWindow.addActor(shareBtn);
 		gameOverWindow.addActor(againBtn);
 		gameOverWindow.addActor(mainbBtn);
-		gameOverWindow.addAction(Actions.scaleTo(1f, 1f, 0.5f));
+//		gameOverWindow.addAction(Actions.scaleTo(1f, 1f, 0.5f));
 		OzFont test = new OzFont("本次得分: 3306",60, Color.WHITE, newTexture(1, 1, Color.BLACK));
 		test.setPosition(GAMEOVER_WINDOWS_WIDTH/2- test.getFontWidth()/2, 325);
 		gameOverWindow.addActor(test);

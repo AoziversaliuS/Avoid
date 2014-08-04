@@ -25,9 +25,9 @@ public class DesktopLauncher {
 //		config.width = G.REFER_SCREEN_WIDTH/2;
 //		config.height = G.REFER_SCREEN_HEIGHT/2;
 		
-		config.width = 640/2;
-		config.height = 960/2;
-		
+//		config.width = 640/2;
+//		config.height = 960/2;
+//		
 		new LwjglApplication(new MyGdxGame(), config);
 	}
 }
